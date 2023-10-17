@@ -1,37 +1,8 @@
 // import { useEffect, useState } from "react";
 import { MongoClient } from "mongodb";
 import MeetupList from "../components/meetups/MeetupList";
-
-const DUMMY_MEETUPS = [
-  {
-    id: "m1",
-    title: "A First Meetup",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg",
-    address: "Some address 5, 123456",
-  },
-  {
-    id: "m2",
-    title: "A First Meetup",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg",
-    address: "Some address 5, 123456",
-  },
-  {
-    id: "m3",
-    title: "A First Meetup",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg",
-    address: "Some address 5, 123456",
-  },
-  {
-    id: "m4",
-    title: "A First Meetup",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg",
-    address: "Some address 5, 123456",
-  },
-];
+import { Fragment } from "react";
+import Head from "next/head";
 
 function HomePage(props) {
   //   const [loadedMeetups, setLoadedMeetups] = useState([]);
@@ -40,7 +11,18 @@ function HomePage(props) {
   //     setLoadedMeetups(DUMMY_MEETUPS);
   //   }, []);
 
-  return <MeetupList meetups={props.meetups} />;
+  return (
+    <Fragment>
+      <Head>
+        <title>React Meetups</title>
+        <meta
+          name="description"
+          content="Browse a huge list of highly active React meetups!"
+        />
+      </Head>
+      <MeetupList meetups={props.meetups} />
+    </Fragment>
+  );
 }
 
 export async function getStaticProps() {
