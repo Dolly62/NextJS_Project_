@@ -1,49 +1,63 @@
+import { MongoClient, ObjectId } from "mongodb";
 import { Fragment } from "react";
 
-function MeetupDetails() {
+function MeetupDetails(props) {
   return (
     <Fragment>
-      <img
-        src="https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg"
-        alt="A First Meetup"
-      />
-      <h1>A First Meetup</h1>
-      <address>Some Street 5</address>
-      <p>The meetup description</p>
+      <img src={props.meetupData.image} alt="A First Meetup" style={{ width: "80%"}}/>
+      <h1>{props.meetupData.title}</h1>
+      <address>{props.meetupData.address}</address>
+      <p>{props.meetupData.description}</p>
     </Fragment>
   );
 }
 
 export async function getStaticPaths() {
+  const client = await MongoClient.connect(
+    "mongodb+srv://test-user_12:vgW_4Sy23@cluster0.3uvvbbl.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+
+  const db = client.db();
+  const meetupsCollection = db.collection("meetups");
+
+  const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
+
+  client.close();
   return {
-    fallback: true,
-    paths: [
-      {
-        params: {
-          meetupId: "m1",
-        },
-      },
-      {
-        params: {
-          meetupId: "m2",
-        },
-      },
-    ],
+    fallback: false,
+    paths: meetups.map((meetup) => ({
+      params: { meetupId: meetup._id.toString() },
+    })),
   };
 }
 
 export async function getStaticProps(context) {
-  const meetupId = context.params;
-  console.log(meetupId);
+  const meetupId = context.params.meetupId;
+
+  const client = await MongoClient.connect(
+    "mongodb+srv://test-user_12:vgW_4Sy23@cluster0.3uvvbbl.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+
+  const db = client.db();
+  const meetupsCollection = db.collection("meetups");
+
+  const objectId = new ObjectId(meetupId);
+
+  const selectedMeetup = await meetupsCollection.findOne({
+    _id: objectId,
+  });
+
+
+  client.close();
+
   return {
     props: {
       meetupData: {
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg",
-        id: meetupId,
-        title: "A First Meetup",
-        address: "Some Street 5",
-        description: "The meetup description",
+        id: selectedMeetup._id.toString(),
+        title: selectedMeetup.title,
+        address: selectedMeetup.address,
+        description: selectedMeetup.description,
+        image: selectedMeetup.image,
       },
     },
   };
